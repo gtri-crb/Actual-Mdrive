@@ -8,7 +8,7 @@ import array
 import time
 
 
-#this is different
+
 
 #TCP connectio
 
@@ -158,7 +158,7 @@ class App:
         if self.units == "rotations":
             conversionFactor = self.toStepRatio
         if self.units == "  degrees":
-            conversionFactor = 360 * self.toStepRatio
+            conversionFactor = self.toStepRatio/360
         if self.units == "    steps":
             conversionFactor = 1
         return conversionFactor
@@ -169,14 +169,14 @@ class App:
         command.grid(row=0, ipady=10)
         
         #move distance
-        self.moveButton = Button(frame, text="Move Distance", fg="blue", font=font2, command=self.moveDistance)
-        self.moveButton.grid(row=1)
+        moveButton = Button(frame, text="Move Distance", fg="blue", font=font2, command=self.moveDistance)
+        moveButton.grid(row=1)
     
         moveScale = Scale(frame, from_=0, to=300, orient=HORIZONTAL, length = 130)
         moveScale.grid(row=1, column=1)
 
-        moveEntry = Entry(frame) 
-        moveEntry.grid(row=1, column=2)
+        self.moveEntry = Entry(frame) 
+        self.moveEntry.grid(row=1, column=2)
 
         self.moveLabel = Label(frame, text=self.units, font=font2)
         self.moveLabel.grid(row=1, column = 3)
@@ -188,8 +188,8 @@ class App:
         constVelocityScale = Scale(frame, from_=0, to=300, orient=HORIZONTAL, length = 130)
         constVelocityScale.grid(row=3, column=1)
 
-        constVelocityEntry = Entry(frame)
-        constVelocityEntry.grid(row=3, column=2)
+        self.constVelocityEntry = Entry(frame)
+        self.constVelocityEntry.grid(row=3, column=2)
         
         self.velocityLabel = Label(frame, text=self.units+"/sec", font=font2)
         self.velocityLabel.grid(row =3, column = 3)
@@ -293,10 +293,10 @@ class App:
             self.mdrive.initialVelocity = int (int(self.ivEntry.get())*conversionFactor)
         if self.mvEntry.get():
             self.mdrive.maximumVelocity = int (int(self.mvEntry.get())*conversionFactor)
-        self.Acceleration.configure(text="Acceleration: " + str(self.mdrive.acceleration) + " " + self.units + "/second^2")
-        self.Deceleration.configure(text="Deceleration: "+ str(self.mdrive.deceleration) + " " + self.units+"/second^2")
-        self.IVelocity.configure(text="Initial velocity: " + str(self.mdrive.initialVelocity)+ " " + self.units+"/second\n")
-        self.MVelocity.configure(text="Maximum velocity: "+ str(self.mdrive.maximumVelocity)+ " " + self.units+"/second^2")
+        self.Acceleration.configure(text="Acceleration: " + str(self.mdrive.acceleration/conversionFactor) + " " + self.units + "/second^2")
+        self.Deceleration.configure(text="Deceleration: "+ str(self.mdrive.deceleration/conversionFactor) + " " + self.units+"/second^2")
+        self.IVelocity.configure(text="Initial velocity: " + str(self.mdrive.initialVelocity/conversionFactor)+ " " + self.units+"/second\n")
+        self.MVelocity.configure(text="Maximum velocity: "+ str(self.mdrive.maximumVelocity/conversionFactor)+ " " + self.units+"/second^2")
         self.proptop.destroy()
 
     def updateThings(self):
@@ -519,23 +519,24 @@ class App:
 
     def moveDistance(self):
 
-        self.motor.send(mdrive.changeAcceleration)
-        self.motor.send(mdrive.changeDeceleration)
-        self.motor.send(mdrive.changeInitialVelocity)
-        self.motor.send(mdrive.changeMaximumVelocity)
+        
+        self.motor.send(mdrive.changeAcceleration())
+        self.motor.send(mdrive.changeDeceleration())
+        self.motor.send(mdrive.changeInitialVelocity())
+        self.motor.send(mdrive.changeMaximumVelocity())
         time.sleep(1)
         if self.moveEntry.get():
-            self.motor.send(mdrive.moveAmount(int(self.moveEntry.get())*getConversionFactor()))
-            print int((self.moveEntry.get())*getConversionFactor())
+            self.motor.send(mdrive.moveAmount(int(self.moveEntry.get())*self.getConversionFactor()))
+            
         
     def moveConstSpeed(self):
-        self.motor.send(mdrive.changeAcceleration)
-        self.motor.send(mdrive.changeDeceleration)
-        self.motor.send(mdrive.changeInitialVelocity)
-        self.motor.send(mdrive.changeMaximumVelocity)
+        self.motor.send(mdrive.changeAcceleration())
+        self.motor.send(mdrive.changeDeceleration())
+        self.motor.send(mdrive.changeInitialVelocity())
+        self.motor.send(mdrive.changeMaximumVelocity())
         time.sleep(1)
         if self.constVelocityEntry.get():
-            self.motor.send(mdrive.moveConstantSpeed(int(self.constVelocityEntry.get())*getConversionFactor()))
+            self.motor.send(mdrive.moveConstantSpeed(int(self.constVelocityEntry.get())*self.getConversionFactor()))
         
 
 def setPresetOne():
