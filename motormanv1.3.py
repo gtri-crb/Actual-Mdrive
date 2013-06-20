@@ -2,10 +2,20 @@
 import tkFont
 from Tkinter import *
 import Tkinter
-import time
 from MDrive import *
 import socket
 import array
+import time
+
+#TCP connection
+
+#initialization                                             ##########
+mdrive = MDrive()
+#TCP_IP = "192.168.2.50"
+#TCP_PORT = 503
+#BUFFER_SIZE = 20
+#motor = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+#motor.connect((TCP_IP,TCP_PORT))
 
 class App:
     
@@ -30,7 +40,7 @@ class App:
         frame.pack()
         self.boldTitleTwo = tkFont.Font(underline=1,size=12,family="Courier")
         self.myvar = StringVar()
-        
+        self.toStepRatio = 3686500
         
         #Fonts
         self.units = "rotations"
@@ -90,10 +100,10 @@ class App:
     def setUnitRotation(self):
         self.units = "rotations"
         self.moveLabel.configure(text=self.units)
-        self.Acceleration.configure(text="Acceleration: " + str(self.mdrive.acceleration) + " " + self.units + "/second^2")
-        self.Deceleration.configure(text="Deceleration: "+ str(self.mdrive.deceleration) + " " + self.units+"/second^2")
-        self.IVelocity.configure(text="Initial velocity: " + str(self.mdrive.initialVelocity)+ " " + self.units+"/second\n")
-        self.MVelocity.configure(text="Maximum velocity: "+ str(self.mdrive.maximumVelocity)+ " " + self.units+"/second^2")
+        self.Acceleration.configure(text="Acceleration: " + str(float(self.mdrive.acceleration) / self.toStepRatio) + " " + self.units + "/second^2")
+        self.Deceleration.configure(text="Deceleration: "+ str(float(self.mdrive.deceleration) / self.toStepRatio) + " " + self.units+"/second^2")
+        self.IVelocity.configure(text="Initial velocity: " + str(float(self.mdrive.initialVelocity) / self.toStepRatio)+ " " + self.units+"/second\n")
+        self.MVelocity.configure(text="Maximum velocity: "+ str(float(self.mdrive.maximumVelocity) / self.toStepRatio)+ " " + self.units+"/second^2")
         self.velocityLabel.configure(text=self.units+"/sec")
         #self.accelLabel.configure(text=self.units+"/sec^2")
         #self.decelLabel.configure(text=self.units+"/sec^2")
@@ -105,10 +115,10 @@ class App:
     def setUnitDegrees(self):
         self.units = "  degrees"
         self.moveLabel.configure(text=self.units)
-        self.Acceleration.configure(text="Acceleration: " + str(self.mdrive.acceleration) + " " + self.units + "/second^2")
-        self.Deceleration.configure(text="Deceleration: "+ str(self.mdrive.deceleration) + " " + self.units+"/second^2")
-        self.IVelocity.configure(text="Initial velocity: " + str(self.mdrive.initialVelocity)+ " " + self.units+"/second\n")
-        self.MVelocity.configure(text="Maximum velocity: "+ str(self.mdrive.maximumVelocity)+ " " + self.units+"/second^2")
+        self.Acceleration.configure(text="Acceleration: " + str(float(self.mdrive.acceleration) / self.toStepRatio * 360) + " " + self.units + "/second^2")
+        self.Deceleration.configure(text="Deceleration: "+ str(float(self.mdrive.deceleration) / self.toStepRatio * 360) + " " + self.units+"/second^2")
+        self.IVelocity.configure(text="Initial velocity: " + str(float(self.mdrive.initialVelocity) / self.toStepRatio * 360)+ " " + self.units+"/second\n")
+        self.MVelocity.configure(text="Maximum velocity: "+ str(float(self.mdrive.maximumVelocity) / self.toStepRatio * 360) + " " + self.units+"/second^2")
         self.velocityLabel.configure(text=self.units+"/sec")
         #self.accelLabel.configure(text=self.units+"/sec^2")
         #self.decelLabel.configure(text=self.units+"/sec^2")
@@ -138,6 +148,17 @@ class App:
         self.decelLabel.configure(text=self.units+"/sec^2")
         self.ivLabel.configure(text=self.units+"/sec")
         self.mvLabel.configure(text=self.units+"/sec")
+
+    #used for converting between units
+
+    def getConversionFactor(self):
+        if self.units == "rotations":
+            conversionFactor = self.toStepRatio
+        if self.units == "  degrees":
+            conversionFactor = 360 * self.toStepRatio
+        if self.units == "    steps":
+            conversionFactor = 1
+        return conversionFactor
 
     def makeCommands(self,master,frame,boldTitle,font2):
         #Commands
@@ -259,10 +280,16 @@ class App:
         okayButton.grid(row=7,column = 1)
 
     def setValues(self):
-        self.mdrive.acceleration = self.accelEntry.get()
-        self.mdrive.deceleration = self.decelEntry.get()
-        self.mdrive.initialVelocity = self.ivEntry.get()
-        self.mdrive.maximumVelocity = self.mvEntry.get()
+        conversionFactor = self.getConversionFactor()
+
+        if self.accelEntry.get():
+            self.mdrive.acceleration = int (int(self.accelEntry.get())*conversionFactor)
+        if self.decelEntry.get():
+            self.mdrive.deceleration = int (int(self.decelEntry.get())*conversionFactor)
+        if self.ivEntry.get():
+            self.mdrive.initialVelocity = int (int(self.ivEntry.get())*conversionFactor)
+        if self.mvEntry.get():
+            self.mdrive.maximumVelocity = int (int(self.mvEntry.get())*conversionFactor)
         self.Acceleration.configure(text="Acceleration: " + str(self.mdrive.acceleration) + " " + self.units + "/second^2")
         self.Deceleration.configure(text="Deceleration: "+ str(self.mdrive.deceleration) + " " + self.units+"/second^2")
         self.IVelocity.configure(text="Initial velocity: " + str(self.mdrive.initialVelocity)+ " " + self.units+"/second\n")
@@ -270,14 +297,15 @@ class App:
         self.proptop.destroy()
 
     def updateThings(self):
+
         if (self.units == "rotations"):
-            self.setUnitRotation
+            self.setUnitRotation()
             print "rot"
         if (self.units == "  degrees"):
-            self.setUnitDegrees
+            self.setUnitDegrees()
             print "deg"
         if (self.units == "    steps"):
-            self.setUnitSteps
+            self.setUnitSteps()
             print "step"
 
     def editPresets(self):
@@ -344,7 +372,13 @@ class App:
         okayButton = Button(self.scaletop, text="All done", fg = "blue", command=self.closeScale, width = 10)
         okayButton.grid(row=3,column = 1)
 
+
+
     def closeScale(self):
+        if self.stepsEntry.get() and self.rotationsEntry.get():
+            self.toStepRatio = float (self.stepsEntry.get())/float (self.rotationsEntry.get())
+            self.updateThings()
+
         self.scaletop.destroy()
 
     def editBounds(self):
@@ -371,24 +405,25 @@ class App:
 
     def showProperties(self,master,frame,boldTitle,font2):
         #properties
+        
         self.prperties = Label(frame, text="Properties",  font=boldTitle)
         self.prperties.grid(row=0, column = 4, ipady = 10)
         #forward/backwards
         self.Direction = Label(frame, text="Direction: ",  font=font2, justify=LEFT)
         self.Direction.grid(row=1, column = 4)
         #acceleration
-        self.Acceleration = Label(frame, text="Acceleration: " + str(self.mdrive.acceleration) + " " + self.units + "/second^2",  font=font2,justify=LEFT)
+        self.Acceleration = Label(frame, text="Acceleration: " + str(float(self.mdrive.acceleration)/self.toStepRatio) + " " + self.units + "/second^2",  font=font2,justify=LEFT)
         self.Acceleration.grid(row=2, column = 4)
         #deceleration
-        self.Deceleration = Label(frame, text="Deceleration: "+ str(self.mdrive.deceleration) + " " + self.units+"/second^2",  font=font2,justify=LEFT)
+        self.Deceleration = Label(frame, text="Deceleration: "+ str(float(self.mdrive.deceleration)/self.toStepRatio) + " " + self.units+"/second^2",  font=font2,justify=LEFT)
         self.Deceleration.grid(row=3, column = 4)
         #initial velocity
-        self.IVelocity = Label(frame, text="Initial velocity: " + str(self.mdrive.initialVelocity)+ " " + self.units+"/second\n",  font=font2,justify=LEFT)
+        self.IVelocity = Label(frame, text="Initial velocity: " + str(float(self.mdrive.initialVelocity)/self.toStepRatio)+ " " + self.units+"/second\n",  font=font2,justify=LEFT)
         self.IVelocity.grid(row=4, column = 4)
         #max velocity
-        self.MVelocity = Label(frame, text="Maximum velocity: "+ str(self.mdrive.maximumVelocity)+ " " + self.units+"/second^2",  font=font2,justify=LEFT)
+        self.MVelocity = Label(frame, text="Maximum velocity: "+ str(float (self.mdrive.maximumVelocity) / self.toStepRatio)+ " " + self.units+"/second^2",  font=font2,justify=LEFT)
         self.MVelocity.grid(row=5, column = 4)
-
+        
 
     def showPresets(self,master,frame,boldTitle,font2):
         #presets
@@ -480,30 +515,24 @@ class App:
         print self.motor.listen()
 
     def moveDistance(self):
-        if (mdrive.acceleration !=-87):
-            self.motor.send(mdrive.changeAcceleration(int(self.accelEntry.get())))
-        if (mdrive.deceleration !=-87):
-            self.motor.send(mdrive.changeDeceleration(int(self.decelEntry.get())))
-        if (mdrive.initialVelocity !=-87):
-            self.motor.send(mdrive.changeInitialVelocity(int(self.ivEntry.get())))
-        if (mdrive.maximumVelocity !=-87):
-            self.motor.send(mdrive.changeMaximumVelocity(int(self.mvEntry.get())))
+
+        self.motor.send(mdrive.changeAcceleration)
+        self.motor.send(mdrive.changeDeceleration)
+        self.motor.send(mdrive.changeInitialVelocity)
+        self.motor.send(mdrive.changeMaximumVelocity)
         time.sleep(1)
         if self.moveEntry.get():
-            self.motor.send(mdrive.moveAmount(int(self.moveEntry.get())))
+            self.motor.send(mdrive.moveAmount(int(self.moveEntry.get())*getConversionFactor()))
+            print int((self.moveEntry.get())*getConversionFactor())
         
     def moveConstSpeed(self):
-        if self.accelEntry.get():
-            self.motor.send(mdrive.changeAcceleration(int(self.accelEntry.get())))
-        if self.decelEntry.get():
-            self.motor.send(mdrive.changeDeceleration(int(self.decelEntry.get())))
-        if self.ivEntry.get(): 
-            self.motor.send(mdrive.changeInitialVelocity(int(self.ivEntry.get())))
-        if self.mvEntry.get(): 
-            self.motor.send(mdrive.changeMaximumVelocity(int(self.mvEntry.get())))
+        self.motor.send(mdrive.changeAcceleration)
+        self.motor.send(mdrive.changeDeceleration)
+        self.motor.send(mdrive.changeInitialVelocity)
+        self.motor.send(mdrive.changeMaximumVelocity)
         time.sleep(1)
         if self.constVelocityEntry.get():
-            self.motor.send(mdrive.moveConstantSpeed(int(self.constVelocityEntry.get())))
+            self.motor.send(mdrive.moveConstantSpeed(int(self.constVelocityEntry.get())*getConversionFactor()))
         
 
 def setPresetOne():
