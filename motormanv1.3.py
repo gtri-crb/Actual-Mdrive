@@ -14,11 +14,11 @@ import time
 
 #initialization                                             ##########
 mdrive = MDrive()
-TCP_IP = "192.168.2.50"
-TCP_PORT = 503
-BUFFER_SIZE = 20
+#TCP_IP = "192.168.2.50"
+#TCP_PORT = 503
+#BUFFER_SIZE = 20
 motor = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-motor.connect((TCP_IP,TCP_PORT))
+#motor.connect((TCP_IP,TCP_PORT))
 
 class App:
     
@@ -103,6 +103,7 @@ class App:
 
     #sets the units as rotations
     def setUnitRotation(self):
+
         self.units = "rotations"
         self.moveLabel.configure(text=self.units)
         self.Acceleration.configure(text="Acceleration: " + str(float(mdrive.acceleration) / self.toStepRatio) + " " + self.units + "/second^2")
@@ -118,6 +119,7 @@ class App:
 
     #sets the units as degrees
     def setUnitDegrees(self):
+
         self.units = "  degrees"
         self.moveLabel.configure(text=self.units)
         self.Acceleration.configure(text="Acceleration: " + str(float(mdrive.acceleration) / self.toStepRatio * 360) + " " + self.units + "/second^2")
@@ -133,6 +135,7 @@ class App:
 
     #sets the units as steps
     def setUnitSteps(self):
+
         self.units = "    steps"
         self.moveLabel.configure(text=self.units)
         self.Acceleration.configure(text="Acceleration: " + str(mdrive.acceleration) + " " + self.units + "/second^2")
@@ -173,24 +176,27 @@ class App:
         #move distance
         moveButton = Button(frame, text="Move Distance", fg="blue", font=font2, command=self.moveDistance)
         moveButton.grid(row=1)
-    
-        moveScale = Scale(frame, from_=0, to=300, orient=HORIZONTAL, length = 130)
+
+        self.moveValue = IntVar()
+        moveScale = Scale(frame, from_=0, to=1800, variable = self.moveValue, orient=HORIZONTAL, length = 130)
         moveScale.grid(row=1, column=1)
 
-        self.moveEntry = Entry(frame) 
+        self.moveEntry = Entry(frame, textvariable = self.moveValue) 
         self.moveEntry.grid(row=1, column=2)
 
         self.moveLabel = Label(frame, text=self.units, font=font2)
         self.moveLabel.grid(row=1, column = 3)
 
         #move at constant speed
+
         constVelocityButton = Button(frame, text="Move Constant", fg="blue", font=font2, command =self.moveConstSpeed)
         constVelocityButton.grid(row=3)
     
-        constVelocityScale = Scale(frame, from_=0, to=300, orient=HORIZONTAL, length = 130)
+        self.velValue = IntVar()
+        constVelocityScale = Scale(frame, from_=0, to=1800, variable = self.velValue, orient=HORIZONTAL, length = 130)
         constVelocityScale.grid(row=3, column=1)
 
-        self.constVelocityEntry = Entry(frame)
+        self.constVelocityEntry = Entry(frame, textvariable = self.velValue)
         self.constVelocityEntry.grid(row=3, column=2)
         
         self.velocityLabel = Label(frame, text=self.units+"/sec", font=font2)
@@ -220,16 +226,11 @@ class App:
         accel = Label(self.proptop, text="Acceleration", fg="blue")
         accel.grid(row=2, column=0)
     
-        self.myvar.trace("w", self.mywarWritten)
-        self.myvar.set("20")
-        self.accelEntry = Entry(self.proptop,textvariable=self.myvar)
+        self.accVar = IntVar()        
+        self.accelEntry = Entry(self.proptop,textvariable=self.accVar)
         self.accelEntry.grid(row=2, column=2)
 
-        accelScale = Scale(self.proptop, from_=0, to=300, orient=HORIZONTAL, length = 130,variable=10)
-        number = 0
-        if (self.myvar.get()):
-            number = int(float(self.myvar.get()))
-        accelScale.set(number)
+        accelScale = Scale(self.proptop, from_=0, to=1800, orient=HORIZONTAL, length = 130,variable=self.accVar)
         accelScale.grid(row=2, column=1)
 
 
@@ -240,12 +241,13 @@ class App:
         #move deceleration
         decel = Label(self.proptop, text="Deceleration", fg="blue", activebackground="purple")
         decel.grid(row=3, column = 0)
-    
-        decelScale = Scale(self.proptop, from_=0, to=300, orient=HORIZONTAL, length = 130)
+
+        self.decVar = IntVar()
+        decelScale = Scale(self.proptop, from_=0, to=1800, variable = self.decVar, orient=HORIZONTAL, length = 130)
         decelScale.grid(row=3, column=1)
 
         
-        self.decelEntry = Entry(self.proptop)
+        self.decelEntry = Entry(self.proptop, textvariable = self.decVar)
         self.decelEntry.grid(row=3, column=2)
         
         self.decelLabel = Label(self.proptop, text=self.units+"/second^2")
@@ -256,10 +258,11 @@ class App:
         ivButton = Label(self.proptop, text="Initial Velocity", fg="blue")
         ivButton.grid(row=4, column = 0)
     
-        ivScale = Scale(self.proptop, from_=0, to=300, orient=HORIZONTAL, length = 130)
+        self.ivVar = IntVar()
+        ivScale = Scale(self.proptop, from_=0, to=1800, variable = self.ivVar, orient=HORIZONTAL, length = 130)
         ivScale.grid(row=4, column=1)
 
-        self.ivEntry = Entry(self.proptop)
+        self.ivEntry = Entry(self.proptop, textvariable = self.ivVar)
         self.ivEntry.grid(row=4, column=2)
         
         self.ivLabel = Label(self.proptop, text=self.units+"/second")
@@ -269,11 +272,12 @@ class App:
         #max velocity
         mv = Label(self.proptop, text="Max Velocity", fg="blue")
         mv.grid(row=5, column = 0)
-    
-        mvScale = Scale(self.proptop, from_=0, to=300, orient=HORIZONTAL, length = 130)
+
+        self.mvVar = IntVar()
+        mvScale = Scale(self.proptop, from_=0, to=1800, variable = self.mvVar, orient=HORIZONTAL, length = 130)
         mvScale.grid(row=5, column=1)
 
-        self.mvEntry = Entry(self.proptop)
+        self.mvEntry = Entry(self.proptop, textvariable = self.mvVar)
         self.mvEntry.grid(row=5, column=2)
         
         self.mvLabel = Label(self.proptop, text=self.units+"/second")
@@ -311,6 +315,7 @@ class App:
 
     def updateThings(self):
 
+        
         if (self.units == "rotations"):
             self.setUnitRotation()
             print "rot"
