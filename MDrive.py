@@ -47,12 +47,12 @@ class MDrive:
         self.microstepResolution = number
         return ("MS=%d \r\n") % number
 
-    def changeInitialVelocity(self, number):
-        self.initialVelocity = number
-        return ("VI %d \r\n") % number
+    def changeInitialVelocity(self):
 
-    def changeMaximumVelocity(self, number):
-        self.maximumVelocity = number
+        return ("VI %d \r\n") % self.initialVelocity
+
+    def changeMaximumVelocity(self):
+
         return ("VM=%d \r\n") % self.maximumVelocity
 
     def getAccelerationAndDeceleration (self):
