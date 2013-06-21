@@ -43,6 +43,7 @@ class App:
         frame.pack()
         self.boldTitleTwo = tkFont.Font(underline=1,size=12,family="Courier")
         self.myvar = StringVar()
+        self.dirVar = 1
         self.toStepRatio = 3686500
         
         #Fonts
@@ -206,12 +207,14 @@ class App:
         self.prperties.grid(row=0, column = 0, ipady = 10)
 
         #forward/backward
-        var = IntVar()
-        forward = Radiobutton(self.proptop, text="Forward", variable = var, value = 1)
+
+        forward = Radiobutton(self.proptop, text="Forward", variable = self.dirVar, value = 1, command = lambda: self.setDirVar(1))
         forward.grid(row=1,column=0)
         forward.select()
-        backward = Radiobutton(self.proptop, text="Backward", variable = var, value = 2)
+        backward = Radiobutton(self.proptop, text="Backward", variable = self.dirVar, value = 2, command = lambda: self.setDirVar(-1))
         backward.grid(row=1,column=1)
+
+        print self.dirVar
         
         #acceleration
         accel = Label(self.proptop, text="Acceleration", fg="blue")
@@ -283,6 +286,10 @@ class App:
         okayButton.grid(row=7,column = 1)
 
     def setValues(self):
+
+        
+
+        
         conversionFactor = self.getConversionFactor()
 
         if self.accelEntry.get():
@@ -298,6 +305,9 @@ class App:
         self.IVelocity.configure(text="Initial velocity: " + str(self.mdrive.initialVelocity/conversionFactor)+ " " + self.units+"/second\n")
         self.MVelocity.configure(text="Maximum velocity: "+ str(self.mdrive.maximumVelocity/conversionFactor)+ " " + self.units+"/second^2")
         self.proptop.destroy()
+
+    def setDirVar(self, value):
+        self.dirVar = value
 
     def updateThings(self):
 
@@ -526,7 +536,7 @@ class App:
         self.motor.send(mdrive.changeMaximumVelocity())
         time.sleep(1)
         if self.moveEntry.get():
-            self.motor.send(mdrive.moveAmount(int(self.moveEntry.get())*self.getConversionFactor()))
+            self.motor.send(mdrive.moveAmount(self.dirVar * int(self.moveEntry.get())*self.getConversionFactor()))
             
         
     def moveConstSpeed(self):
@@ -536,7 +546,7 @@ class App:
         self.motor.send(mdrive.changeMaximumVelocity())
         time.sleep(1)
         if self.constVelocityEntry.get():
-            self.motor.send(mdrive.moveConstantSpeed(int(self.constVelocityEntry.get())*self.getConversionFactor()))
+            self.motor.send(mdrive.moveConstantSpeed(self.dirVar * int(self.constVelocityEntry.get())*self.getConversionFactor()))
         
 
 def setPresetOne():
