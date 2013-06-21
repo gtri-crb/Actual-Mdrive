@@ -41,7 +41,12 @@ class App:
         self.myvar = StringVar()
         self.dirVar = 1
         self.toStepRatio = 3686500
-        
+        self.presetone = []
+        self.presettwo = []
+        self.presetthree = []
+        self.presetfour = []
+
+       
         #Fonts
         self.units = "rotations"
         boldTitle = tkFont.Font(underline=1,size=12,family="Courier")
@@ -337,22 +342,17 @@ class App:
         #presets
         moveLabel = Label(self.prestop, text="Presets",justify=RIGHT)
         moveLabel.grid(row=10, column = 0,ipady=10)
-        self.presetone = []
-        self.presettwo = []
-        self.presetthree = []
-        self.presetfour = []
-
         #save States
-        oneButton = Button(self.prestop, text="1", fg="darkgreen", width = 10,command = self.PresetOne)
+        oneButton = Button(self.prestop, text="1", fg="darkgreen", width = 10,command = self.PresetOneCom)
         oneButton.grid(row=11, ipady=5)
 
-        twoButton = Button(self.prestop, text="2",fg="darkgreen", width = 10,command = self.PresetTwo)
+        twoButton = Button(self.prestop, text="2",fg="darkgreen", width = 10,command = self.PresetTwoCom)
         twoButton.grid(row=11, column = 1, ipady=5)
 
-        threeButton = Button(self.prestop, text="3",fg="darkgreen", width = 10,command = self.PresetThree)
+        threeButton = Button(self.prestop, text="3",fg="darkgreen", width = 10,command = self.PresetThreeCom)
         threeButton.grid(row=11, column = 2, ipady=5)
 
-        fourButton = Button(self.prestop, text="4",fg="darkgreen", width = 10,command = self.PresetFour)
+        fourButton = Button(self.prestop, text="4",fg="darkgreen", width = 10,command = self.PresetFourCom)
         fourButton.grid(row=11, column = 3, ipady=5)
 
         self.dirVar = 4
@@ -368,48 +368,76 @@ class App:
         okayButton.grid(row=13,column = 1)
 
 
-    def setPresetOne(self):
-        if (self.var_two.get() == 1):
-            self.presetone = [mdrive.acceleration, mdrive.deceleration,mdrive.initialVelocity,mdrive.maximumVelocity]
-            print "self.awesome"
-        else:
-            print "self.other"
-
-
     def setLoad(self):
 	self.LoadorSave = True
-	print str(self.LoadorSave) + "a"
 
     def setSave(self):
 	self.LoadorSave = False
-	print str(self.LoadorSave) + "b"
 
-    def PresetOne(self):
+    def PresetOneCom(self):
         if self.LoadorSave == True:
-	    print "one"
-        if self.LoadorSave == False:
-	    self.presetone = [self.dirVar,self.mdrive.acceleration,self.mdrive.deceleration,self.mdrive.initialVelocity,self.mdrive.maximumVelocity]
+	    mdrive.acceleration = self.presetone[1]
+	    mdrive.deceleration = self.presetone[2]
+	    mdrive.initialVelocity = self.presetone[3]
+	    mdrive.maximumVelocity = self.presetone[4]
+	    if (self.units == "rotations"):
+		self.setUnitRotation()
+	    if (self.units == "  degrees"):
+		self.setUnitDegrees()
+	    if (self.units == "    steps"):
+		self.setUnitSteps()
+	if self.LoadorSave == False:
+	   self.presetone = [self.dirVar,mdrive.acceleration,mdrive.deceleration,mdrive.initialVelocity,mdrive.maximumVelocity]
 
-	
-    def PresetTwo(self):
-        if self.LoadorSave == True:
-	    print "two"
-        if self.LoadorSave == False:
-	    presettwo = [self.dirVar,self.mdrive.acceleration,self.mdrive.deceleration,self.mdrive.initialVelocity,self.mdrive.maximumVelocity]
-	
 
-    def PresetThree(self):
-        if self.LoadorSave == True:
-	    print "three"
-        if self.LoadorSave == False:
-	    presetthree = [self.dirVar,self.mdrive.acceleration,self.mdrive.deceleration,self.mdrive.initialVelocity,self.mdrive.maximumVelocity]
 
 	
-    def PresetFour(self):
+    def PresetTwoCom(self):
         if self.LoadorSave == True:
-	    print "four"
+	    mdrive.acceleration = self.presettwo[1]
+	    mdrive.deceleration = self.presettwo[2]
+	    mdrive.initialVelocity = self.presettwo[3]
+	    mdrive.maximumVelocity = self.presettwo[4]
+	    if (self.units == "rotations"):
+		self.setUnitRotation()
+	    if (self.units == "  degrees"):
+		self.setUnitDegrees()
+	    if (self.units == "    steps"):
+		self.setUnitSteps()
         if self.LoadorSave == False:
-	    presetfour = [self.dirVar,self.mdrive.acceleration,self.mdrive.deceleration,self.mdrive.initialVelocity,self.mdrive.maximumVelocity]
+	    self.presettwo = [self.dirVar,mdrive.acceleration,mdrive.deceleration,mdrive.initialVelocity,mdrive.maximumVelocity]
+	
+
+    def PresetThreeCom(self):
+        if self.LoadorSave == True:
+	    mdrive.acceleration = self.presetthree[1]
+	    mdrive.deceleration = self.presetthree[2]
+	    mdrive.initialVelocity = self.presetthree[3]
+	    mdrive.maximumVelocity = self.presetthree[4]
+	    if (self.units == "rotations"):
+		self.setUnitRotation()
+	    if (self.units == "  degrees"):
+		self.setUnitDegrees()
+	    if (self.units == "    steps"):
+		self.setUnitSteps()
+        if self.LoadorSave == False:
+	    self.presetthree = [self.dirVar,mdrive.acceleration,mdrive.deceleration,mdrive.initialVelocity,mdrive.maximumVelocity]
+
+	
+    def PresetFourCom(self):
+        if self.LoadorSave == True:
+	    mdrive.acceleration = self.presetfour[1]
+	    mdrive.deceleration = self.presetfour[2]
+	    mdrive.initialVelocity = self.presetfour[3]
+	    mdrive.maximumVelocity = self.presetfour[4]
+	    if (self.units == "rotations"):
+		self.setUnitRotation()
+	    if (self.units == "  degrees"):
+		self.setUnitDegrees()
+	    if (self.units == "    steps"):
+		self.setUnitSteps()
+        if self.LoadorSave == False:
+	    self.presetfour = [self.dirVar,mdrive.acceleration,mdrive.deceleration,mdrive.initialVelocity,mdrive.maximumVelocity]
 
 	
 
