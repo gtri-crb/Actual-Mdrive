@@ -11,57 +11,56 @@
 
 
 class MDrive:
-    acceleration = 0
-    deceleration = 0
+    acceleration = 1000000
+    deceleration = 1000000
     microstepResolution = 0
     position = 0
-    initialVelocity = 0
-    maximumVelocity = 0
+    initialVelocity = 1000
+    maximumVelocity = 68000
+ 
 
     
 
     def movingTest (self):                     #works!
         return("MR 1000000\r\n")
 
-    def changeAcceleration (self, number):
-        self.acceleration = number
+    def changeAcceleration (self):
+        return ("A %d \r\n") % self.acceleration
 
-    def changeDeceleration (self, number):
-        self.deceleration = number
+
+
+    def getAcceleration (self):
+        return ("PR A\r\n")
+
+    def getPosition (self):
+        return ("PR P")
+
+    def getVelocity (self):
+        return ("PR V")
     
-    def changeDeccelerationToAcceleration (self):
+    def changeDeceleration (self):
+        return ("D %d \r\n") % self.deceleration
+    
+    def changeDecelerationToAcceleration (self):
         return ("D=A\r\n")
 
     def changeMicrostepResolution(self, number):
         self.microstepResolution = number
+        return ("MS=%d \r\n") % number
 
     def changeInitialVelocity(self, number):
         self.initialVelocity = number
+        return ("VI %d \r\n") % number
 
     def changeMaximumVelocity(self, number):
         self.maximumVelocity = number
+        return ("VM=%d \r\n") % self.maximumVelocity
 
     def getAccelerationAndDeceleration (self):
         return ("A=%d\r\nD=%d") % self.acceleration, self.deceleration
 
-    def getAcceleration(self):
-
-        return ("A=%d\r\n") % self.acceleration
-
-    def getMicrostepResolution(self):
-        return ("MS=%d\r\n") % self.microstepResolution
-
     def resetPositionCounter(self):             
         return ("P=0\r\n")
-    
-    def getInitialVelocity(self):
-        global initialVelocity
-        stringhere = "VI=%d\r\n" % self.initialVelocity
-        return stringhere
-#        return ("VI=%s\r\n") % initialVelocity
-
-    def getMaximumVelocity(self, ):
-        return ("VM=%d\r\n") % self.maximumVelocity
     
     def moveAmount(self, number):                      #works!
         return("MR %d\r\n") % number
@@ -72,4 +71,3 @@ class MDrive:
     def stop(self):
         return ("SL\r\n")
     
-
