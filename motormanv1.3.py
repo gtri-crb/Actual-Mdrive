@@ -1,4 +1,4 @@
-# File: motorman.py
+#File: motorman.py
 import tkFont
 from Tkinter import *
 import Tkinter
@@ -19,7 +19,7 @@ mdrive = MDrive()
 #BUFFER_SIZE = 20
 motor = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 #motor.connect((TCP_IP,TCP_PORT))
-
+ 
 class App:
     
     #Initialization
@@ -35,10 +35,6 @@ class App:
     def __init__(self, master):
 
         self.masterReference = master
-        self.presetone = []
-        self.presettwo = []
-        self.presetthree = []
-        self.presetfour = []
         frame = Frame(master)
         frame.pack()
         self.boldTitleTwo = tkFont.Font(underline=1,size=12,family="Courier")
@@ -80,6 +76,7 @@ class App:
         filemenu.add_command(label="Exit", command=self.onExit)
         filemenu.add_command(label="Info", command = self.makeCredits)
 
+        filemenu.add_command(label="Save", command = self.saveFile)
         filemenu.add_command(label="Save State", command = self.saveasFile)
         filemenu.add_command(label="Open State", command = self.openFile)
         filemenu.add_command(label="Workbook")
@@ -115,7 +112,6 @@ class App:
         #self.decelLabel.configure(text=self.units+"/sec^2")
         #self.ivLabel.configure(text=self.units+"/sec")
         #self.mvLabel.configure(text=self.units+"/sec")
-        #self.updateAllUnits
 
     #sets the units as degrees
     def setUnitDegrees(self):
@@ -222,13 +218,17 @@ class App:
 
         
         
-        #acceleration
+        self.myvardecel = StringVar()
+	self.myvarivelocity = StringVar()
+	self.myvarmvelocity = StringVar()
+	#acceleration
         accel = Label(self.proptop, text="Acceleration", fg="blue")
         accel.grid(row=2, column=0)
     
         self.accVar = IntVar()        
         self.accelEntry = Entry(self.proptop,textvariable=self.accVar)
         self.accelEntry.grid(row=2, column=2)
+
 
         accelScale = Scale(self.proptop, from_=0, to=1800, orient=HORIZONTAL, length = 130,variable=self.accVar)
         accelScale.grid(row=2, column=1)
@@ -247,6 +247,7 @@ class App:
         decelScale.grid(row=3, column=1)
 
         
+
         self.decelEntry = Entry(self.proptop, textvariable = self.decVar)
         self.decelEntry.grid(row=3, column=2)
         
@@ -262,6 +263,7 @@ class App:
         ivScale = Scale(self.proptop, from_=0, to=1800, variable = self.ivVar, orient=HORIZONTAL, length = 130)
         ivScale.grid(row=4, column=1)
 
+
         self.ivEntry = Entry(self.proptop, textvariable = self.ivVar)
         self.ivEntry.grid(row=4, column=2)
         
@@ -276,6 +278,7 @@ class App:
         self.mvVar = IntVar()
         mvScale = Scale(self.proptop, from_=0, to=1800, variable = self.mvVar, orient=HORIZONTAL, length = 130)
         mvScale.grid(row=5, column=1)
+
 
         self.mvEntry = Entry(self.proptop, textvariable = self.mvVar)
         self.mvEntry.grid(row=5, column=2)
@@ -310,6 +313,7 @@ class App:
         self.MVelocity.configure(text="Maximum velocity: "+ str(float(mdrive.maximumVelocity)/conversionFactor)+ " " + self.units+"/second^2")
         self.proptop.destroy()
 
+
     def setDirVar(self, value):
         self.dirVar = value
 
@@ -333,30 +337,36 @@ class App:
         #presets
         moveLabel = Label(self.prestop, text="Presets",justify=RIGHT)
         moveLabel.grid(row=10, column = 0,ipady=10)
+        self.presetone = []
+        self.presettwo = []
+        self.presetthree = []
+        self.presetfour = []
 
         #save States
-        oneButton = Button(self.prestop, text="1", fg="darkgreen", width = 10,command = self.setPresetOne)
+        oneButton = Button(self.prestop, text="1", fg="darkgreen", width = 10,command = self.PresetOne)
         oneButton.grid(row=11, ipady=5)
 
-        twoButton = Button(self.prestop, text="2",fg="darkgreen", width = 10)
+        twoButton = Button(self.prestop, text="2",fg="darkgreen", width = 10,command = self.PresetTwo)
         twoButton.grid(row=11, column = 1, ipady=5)
 
-        threeButton = Button(self.prestop, text="3",fg="darkgreen", width = 10)
+        threeButton = Button(self.prestop, text="3",fg="darkgreen", width = 10,command = self.PresetThree)
         threeButton.grid(row=11, column = 2, ipady=5)
 
-        fourButton = Button(self.prestop, text="4",fg="darkgreen", width = 10)
+        fourButton = Button(self.prestop, text="4",fg="darkgreen", width = 10,command = self.PresetFour)
         fourButton.grid(row=11, column = 3, ipady=5)
 
-        self.var_two = IntVar()
-        self.Load = Radiobutton(self.prestop, text="Load", variable=self.var_two, value=1, command=setPresetOne)
+        self.dirVar = 4
+	self.var_two = IntVar()
+	self.LoadorSave = True
+        self.Load = Radiobutton(self.prestop, text="Load", variable=self.var_two, value=1, command=self.setLoad)
         self.Load.grid(row=12,column=1)
         self.Load.select()
-        self.Save = Radiobutton(self.prestop, text="Save", variable=self.var_two, value=2, command=self.setPresetOne)
+        self.Save = Radiobutton(self.prestop, text="Save", variable=self.var_two, value=2, command=self.setSave)
         self.Save.grid(row=12,column=2)
         print self
-        print var_two.get()
         okayButton = Button(self.prestop, text="All done", fg = "blue", command=self.closepresets, width = 10)
         okayButton.grid(row=13,column = 1)
+
 
     def setPresetOne(self):
         if (self.var_two.get() == 1):
@@ -365,6 +375,50 @@ class App:
         else:
             print "self.other"
 
+
+    def setLoad(self):
+	self.LoadorSave = True
+	print str(self.LoadorSave) + "a"
+
+    def setSave(self):
+	self.LoadorSave = False
+	print str(self.LoadorSave) + "b"
+
+    def PresetOne(self):
+        if self.LoadorSave == True:
+	    print "one"
+ 	    self.presetone = [self.dirVar,self.mdrive.acceleration,self.mdrive.deceleration,self.mdrive.initialVelocity,self.mdrive.maximumVelocity]
+	    i = 0
+	    for i in range(0,len(self.presetone)):
+		print self.presetone[i]
+        if self.LoadorSave == False:
+            print "pranav"
+	
+	
+    def PresetTwo(self):
+        if self.LoadorSave == True:
+	    print "two"
+	    presettwo = [self.dirVar,self.mdrive.acceleration,self.mdrive.deceleration,self.mdrive.initialVelocity,self.mdrive.maximumVelocity]
+        if self.LoadorSave == False:
+            print "pranav"
+	
+
+    def PresetThree(self):
+        if self.LoadorSave == True:
+	    print "three"
+    	    presetthree = [self.dirVar,self.mdrive.acceleration,self.mdrive.deceleration,self.mdrive.initialVelocity,self.mdrive.maximumVelocity]
+        if self.LoadorSave == False:
+            print "pranav"
+	
+	
+    def PresetFour(self):
+        if self.LoadorSave == True:
+	    print "four"
+	    presetfour = [self.dirVar,self.mdrive.acceleration,self.mdrive.deceleration,self.mdrive.initialVelocity,self.mdrive.maximumVelocity]
+        if self.LoadorSave == False:
+            print "pranav"
+	
+	
 
     def closepresets(self):
         self.prestop.destroy()
@@ -493,12 +547,14 @@ class App:
         self.savetop.title("Save as") 
         self.savetop.geometry("200x120")
 
-        orders = Label(self.savetop, text="Enter filename\n")
+        orders = Label(self.savetop, text="Enter filepath\n")
+	orderstwo = Label (self.savetop, text="starts in C:\\")
         orders.pack()
+	orderstwo.pack()
 
-        self.var = StringVar(self.savetop)
+        self.filepath = StringVar(self.savetop)
         
-        openEntry = Entry(self.savetop, textvariable = self.var)
+        openEntry = Entry(self.savetop, textvariable = self.filepath)
         openEntry.pack()
 
         saveButton = Button(self.savetop, text="Save",command=self.saveFileCloseWindow)
@@ -506,10 +562,30 @@ class App:
 
     def saveFileCloseWindow(self,*args):
         print(self.myvar.get())
-        self.savetop.destroy()
+	savestate = open(self.filepath.get(), 'w')
+	print "writing file..... \n\n\n"
+	i = 0
+	savestate.write('\n' + str(self.mdrive.acceleration))
+	savestate.write('\n' + str(self.mdrive.deceleration))
+	savestate.write('\n' + str(self.mdrive.initialVelocity))
+	for i in range(0,len(self.presetone)):
+	    savestate.write(str(self.presetone[i]))
+	    savestate.write('\n')
+	for i in range(0,len(self.presettwo)):
+            savestate.write(str(self.presettwo[i]))
+	    savestate.write('\n')
+	for i in range(0,len(self.presetthree)):
+            savestate.write(str(self.presetthree[i]))
+	    savestate.write('\n')
+	for i in range(0,len(self.presetfour)):
+            savestate.write(str(self.presetfour[i]))
+	    savestate.write('\n')
+	savestate.write("\nokay")
+	print "done"
+	self.savetop.destroy()
 
     def saveFile(self): 
-        if(self.myvar.get() == null):
+        if(~self.myvar.get()):
             saveasFile()
 #        else:
 
@@ -518,7 +594,7 @@ class App:
         sys.exit ()
 
     def makeCredits(self):
-        print "Pranav Shenoy\nTejas Khorana"
+        print "Pranav Shenoy\nTejas Khorana\nKevin Han"
 
     def getPosition(self):
         motor.send(mdrive.getPosition())
@@ -554,15 +630,7 @@ class App:
             motor.send(mdrive.moveConstantSpeed(self.dirVar * int(self.constVelocityEntry.get())*self.getConversionFactor()))
         
 
-def setPresetOne():
-    print str(var_two.get())
-    print str (var_two)
-    if (var_two.get() == 1):
-        self.presetone = [mdrive.acceleration, mdrive.deceleration,mdrive.initialVelocity,mdrive.maximumVelocity]
-        print "awesome"
-    else:
-        print "other"
-        
+
 root = Tk()
 #var_two = IntVar()
 
