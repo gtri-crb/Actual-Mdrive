@@ -23,7 +23,7 @@ motor = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 class App:
     
     #Initialization
-    #mdrive = MDrive()
+    mdrive = MDrive()
 #    TCP_IP = "192.168.2.50"
 #    TCP_PORT = 503
  #   BUFFER_SIZE = 20
@@ -387,37 +387,30 @@ class App:
     def PresetOne(self):
         if self.LoadorSave == True:
 	    print "one"
- 	    self.presetone = [self.dirVar,self.mdrive.acceleration,self.mdrive.deceleration,self.mdrive.initialVelocity,self.mdrive.maximumVelocity]
-	    i = 0
-	    for i in range(0,len(self.presetone)):
-		print self.presetone[i]
         if self.LoadorSave == False:
-            print "pranav"
-	
+	    self.presetone = [self.dirVar,self.mdrive.acceleration,self.mdrive.deceleration,self.mdrive.initialVelocity,self.mdrive.maximumVelocity]
+
 	
     def PresetTwo(self):
         if self.LoadorSave == True:
 	    print "two"
-	    presettwo = [self.dirVar,self.mdrive.acceleration,self.mdrive.deceleration,self.mdrive.initialVelocity,self.mdrive.maximumVelocity]
         if self.LoadorSave == False:
-            print "pranav"
+	    presettwo = [self.dirVar,self.mdrive.acceleration,self.mdrive.deceleration,self.mdrive.initialVelocity,self.mdrive.maximumVelocity]
 	
 
     def PresetThree(self):
         if self.LoadorSave == True:
 	    print "three"
-    	    presetthree = [self.dirVar,self.mdrive.acceleration,self.mdrive.deceleration,self.mdrive.initialVelocity,self.mdrive.maximumVelocity]
         if self.LoadorSave == False:
-            print "pranav"
-	
+	    presetthree = [self.dirVar,self.mdrive.acceleration,self.mdrive.deceleration,self.mdrive.initialVelocity,self.mdrive.maximumVelocity]
+
 	
     def PresetFour(self):
         if self.LoadorSave == True:
 	    print "four"
-	    presetfour = [self.dirVar,self.mdrive.acceleration,self.mdrive.deceleration,self.mdrive.initialVelocity,self.mdrive.maximumVelocity]
         if self.LoadorSave == False:
-            print "pranav"
-	
+	    presetfour = [self.dirVar,self.mdrive.acceleration,self.mdrive.deceleration,self.mdrive.initialVelocity,self.mdrive.maximumVelocity]
+
 	
 
     def closepresets(self):
@@ -563,11 +556,8 @@ class App:
     def saveFileCloseWindow(self,*args):
         print(self.myvar.get())
 	savestate = open(self.filepath.get(), 'w')
-	print "writing file..... \n\n\n"
+	print "writing file..... \n\n"
 	i = 0
-	savestate.write('\n' + str(self.mdrive.acceleration))
-	savestate.write('\n' + str(self.mdrive.deceleration))
-	savestate.write('\n' + str(self.mdrive.initialVelocity))
 	for i in range(0,len(self.presetone)):
 	    savestate.write(str(self.presetone[i]))
 	    savestate.write('\n')
