@@ -45,6 +45,8 @@ class App:
         self.presettwo = []
         self.presetthree = []
         self.presetfour = []
+	self.presetorder = ["<direction>", "<acceleration>", "<deceleration>", "<initialvelocity>","<maximumvelocity>"]
+	self.presetendorder = ["</direction>", "</acceleration>", "/deceleration>", "</initialvelocity>","</maximumvelocity>"]
 
        
         #Fonts
@@ -203,9 +205,6 @@ class App:
         self.velocityLabel = Label(frame, text=self.units+"/sec", font=font2)
         self.velocityLabel.grid(row =3, column = 3)
 
-    def mywarwritten(*args):
-        print "mywarWritten", self.myvar.get()
-    
     def editProperties(self):
         self.proptop = Tk()
         self.proptop.title("Edit Properties")
@@ -298,9 +297,7 @@ class App:
         okayButton.grid(row=7,column = 1)
 
     def setValues(self):
-
         
-
         
         conversionFactor = self.getConversionFactor()
 
@@ -355,7 +352,6 @@ class App:
         fourButton = Button(self.prestop, text="4",fg="darkgreen", width = 10,command = self.PresetFourCom)
         fourButton.grid(row=11, column = 3, ipady=5)
 
-        self.dirVar = 4
 	self.var_two = IntVar()
 	self.LoadorSave = True
         self.Load = Radiobutton(self.prestop, text="Load", variable=self.var_two, value=1, command=self.setLoad)
@@ -388,7 +384,6 @@ class App:
 		self.setUnitSteps()
 	if self.LoadorSave == False:
 	   self.presetone = [self.dirVar,mdrive.acceleration,mdrive.deceleration,mdrive.initialVelocity,mdrive.maximumVelocity]
-
 
 
 	
@@ -560,9 +555,6 @@ class App:
         print(self.myvar.get())
         self.opentop.destroy()
 
-    def mywarWritten(self,*args):
-        print "mywarWritten",self.myvar.get()
-
     def saveasFile(self):
         self.savetop = Tkinter.Tk()
         self.savetop.title("Save as") 
@@ -582,23 +574,51 @@ class App:
         saveButton.pack()
 
     def saveFileCloseWindow(self,*args):
-        print(self.myvar.get())
 	savestate = open(self.filepath.get(), 'w')
 	print "writing file..... \n\n"
+	savestate.write("<filepath>")
+	savestate.write(self.filepath.get())
+	savestate.write("</filepath>\n")
+	#preset one
 	i = 0
+	savestate.write("<preset_one>\n")
 	for i in range(0,len(self.presetone)):
+	    savestate.write(self.presetorder[i])
 	    savestate.write(str(self.presetone[i]))
+	    savestate.write(self.presetendorder[i])
 	    savestate.write('\n')
+	savestate.write("</preset_one>")
+	savestate.write("\n")
+	#preset two
+	i = 0
+	savestate.write("<preset_two>\n")
 	for i in range(0,len(self.presettwo)):
+ 	    savestate.write(self.presetorder[i])
             savestate.write(str(self.presettwo[i]))
+	    savestate.write(self.presetendorder[i])
 	    savestate.write('\n')
+	savestate.write("</preset_two>")
+	savestate.write("\n")
+	#preset three
+	i=0
+	savestate.write("<preset_three>\n")
 	for i in range(0,len(self.presetthree)):
+  	    savestate.write(self.presetorder[i])
             savestate.write(str(self.presetthree[i]))
+	    savestate.write(self.presetorder[i])
 	    savestate.write('\n')
+	savestate.write("</preset_three>")
+	savestate.write("\n")
+	#preset four
+	i=0
+	savestate.write("<preset_four>\n")
 	for i in range(0,len(self.presetfour)):
+  	    savestate.write(self.presetorder[i])
             savestate.write(str(self.presetfour[i]))
+ 	    savestate.write(self.presetorder[i])
 	    savestate.write('\n')
-	savestate.write("\nokay")
+	savestate.write("</preset_four>")
+
 	print "done"
 	self.savetop.destroy()
 
